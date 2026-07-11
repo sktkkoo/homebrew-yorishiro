@@ -1,0 +1,70 @@
+# Yorishiro の最新リリースを検出して cask を自動更新する。
+#
+# PAT レス設計：Yorishiro repo 側から push する代わりに、この repo 自身の
+# GITHUB_TOKEN で自分の cask を書き換える。定期実行（6時間ごと）に加えて、
+# リリース publish 直後に手動で `gh workflow run bump-yorishiro.yml -R sktkkoo/homebrew-yorishiro`
+# を叩けば即時反映できる。
+name: Bump yorishiro cask
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update cask if a newer release exists
+        run: |
+          set -euo pipefail
+          # Yorishiro repo が private の間（OSS 公開前）や release 未発行時は 404 になる。
+          # その場合は失敗ではなく skip 扱いにする（|| true で curl の -f 失敗を握る）。
+          LATEST=$(curl -fsSL https://api.github.com/repos/sktkkoo/Yorishiro/releases/latest | jq -r .tag_name || true)
+          VERSION="${LATEST#v}"
+          CURRENT=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/yorishiro.rb)
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "no published release found; skip"; exit 0
+          fi
+          if [ "$VERSION" = "$CURRENT" ]; then
+            echo "up to date ($CURRENT)"; exit 0
+          fi
+          # yorishiro_* 資産を持たない古い release では下の curl が失敗する
+          # （対象は v0.5.3 以降）。
+          echo "bumping $CURRENT -> $VERSION"
+          # 両アーキの dmg が揃っていることを sha256 計算を兼ねて確認する。
+          # 片方でも欠けていれば curl -f が落ち、workflow の失敗として気付ける。
+          curl -fsSLo arm.dmg "https://github.com/sktkkoo/Yorishiro/releases/download/${LATEST}/yorishiro_${VERSION}_aarch64.dmg"
+          curl -fsSLo x64.dmg "https://github.com/sktkkoo/Yorishiro/releases/download/${LATEST}/yorishiro_${VERSION}_x64.dmg"
+          SHA_ARM=$(shasum -a 256 arm.dmg | cut -d' ' -f1)
+          SHA_X64=$(shasum -a 256 x64.dmg | cut -d' ' -f1)
+          rm arm.dmg x64.dmg
+          sed -i "s/^  version \".*\"$/  version \"${VERSION}\"/" Casks/yorishiro.rb
+          # cask 内の sha256 は on_arm → on_intel の並び前提（yorishiro.rb 冒頭コメント参照）
+          awk -v arm="$SHA_ARM" -v x64="$SHA_X64" '
+            /sha256 "/ {
+              n++
+              if (n == 1) sub(/"[0-9a-f]{64}"/, "\"" arm "\"")
+              else if (n == 2) sub(/"[0-9a-f]{64}"/, "\"" x64 "\"")
+            }
+            { print }
+          ' Casks/yorishiro.rb > yorishiro.rb.new
+          mv yorishiro.rb.new Casks/yorishiro.rb
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "no changes"; exit 0
+          fi
+          VERSION=$(sed -n 's/^  version "\(.*\)"$/\1/p' Casks/yorishiro.rb)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898326+github-actions[bot]@users.noreply.github.com"
+          git add Casks/yorishiro.rb
+          git commit -m "yorishiro ${VERSION}"
+          git push
