@@ -5,15 +5,15 @@
 # この cask が実際に機能するのも v0.6.0 以降。
 # 下の sha256 は placeholder で、次回の bump で正しい値に置き換わる。
 cask "yorishiro" do
-  version "0.6.1"
+  version "0.6.2"
 
   on_arm do
-    sha256 "410ac6d1d7541f3dc72e93d05c7195a99dd78320f2d9e1419c70fd836627ec3a"
+    sha256 "ffeea38563f6ca04261fafdfc0c97e8ab37806307a3d5e645c088c9d91c492e1"
 
     url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/yorishiro_#{version}_aarch64.dmg"
   end
   on_intel do
-    sha256 "1b77c1dfab1c6cbf28ad2c2b278cd98bde74be1c6498ba68b8b10410a6ec6c43"
+    sha256 "8289b215e04ea4686fe8f7a8c95dff24284f8d0a3284fb3206b359fa7d5d8645"
 
     url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/yorishiro_#{version}_x64.dmg"
   end
