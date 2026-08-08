@@ -34,13 +34,12 @@ jobs:
           if [ "$VERSION" = "$CURRENT" ]; then
             echo "up to date ($CURRENT)"; exit 0
           fi
-          # yorishiro_* 資産を持たない古い release では下の curl が失敗する
-          # （対象は v0.6.0 以降）。
+          # v0.7.0 以降の大文字始まりの Yorishiro_* 資産を取得する。
           echo "bumping $CURRENT -> $VERSION"
           # 両アーキの dmg が揃っていることを sha256 計算を兼ねて確認する。
           # 片方でも欠けていれば curl -f が落ち、workflow の失敗として気付ける。
-          curl -fsSLo arm.dmg "https://github.com/sktkkoo/Yorishiro/releases/download/${LATEST}/yorishiro_${VERSION}_aarch64.dmg"
-          curl -fsSLo x64.dmg "https://github.com/sktkkoo/Yorishiro/releases/download/${LATEST}/yorishiro_${VERSION}_x64.dmg"
+          curl -fsSLo arm.dmg "https://github.com/sktkkoo/Yorishiro/releases/download/${LATEST}/Yorishiro_${VERSION}_aarch64.dmg"
+          curl -fsSLo x64.dmg "https://github.com/sktkkoo/Yorishiro/releases/download/${LATEST}/Yorishiro_${VERSION}_x64.dmg"
           SHA_ARM=$(shasum -a 256 arm.dmg | cut -d' ' -f1)
           SHA_X64=$(shasum -a 256 x64.dmg | cut -d' ' -f1)
           rm arm.dmg x64.dmg
