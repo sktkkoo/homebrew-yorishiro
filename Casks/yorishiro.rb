@@ -1,21 +1,21 @@
 # bump-yorishiro.yml が新リリース検出時に version / sha256 を書き換える。
 # sha256 の並びは on_arm → on_intel の順を前提にしているので入れ替えないこと。
 #
-# 注意: yorishiro_* 名の release 資産を持つのは v0.6.0 以降なので、
-# この cask が実際に機能するのも v0.6.0 以降。
-# 下の sha256 は placeholder で、次回の bump で正しい値に置き換わる。
+# 注意: v0.7.0 から release 資産と app bundle は大文字始まりの
+# Yorishiro_* / Yorishiro.app に変わる。この変更は v0.7.0 の公開後、
+# version / sha256 の bump と同時に main へ反映すること。
 cask "yorishiro" do
   version "0.6.2"
 
   on_arm do
     sha256 "ffeea38563f6ca04261fafdfc0c97e8ab37806307a3d5e645c088c9d91c492e1"
 
-    url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/yorishiro_#{version}_aarch64.dmg"
+    url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/Yorishiro_#{version}_aarch64.dmg"
   end
   on_intel do
     sha256 "8289b215e04ea4686fe8f7a8c95dff24284f8d0a3284fb3206b359fa7d5d8645"
 
-    url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/yorishiro_#{version}_x64.dmg"
+    url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/Yorishiro_#{version}_x64.dmg"
   end
 
   name "Yorishiro"
@@ -31,7 +31,7 @@ cask "yorishiro" do
   auto_updates true
   depends_on :macos
 
-  app "yorishiro.app"
+  app "Yorishiro.app"
 
   zap trash: [
     "~/.yorishiro",
