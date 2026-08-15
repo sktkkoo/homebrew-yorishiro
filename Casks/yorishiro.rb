@@ -5,15 +5,15 @@
 # Yorishiro_* / Yorishiro.app に変わる。この変更は v0.7.0 の公開後、
 # version / sha256 の bump と同時に main へ反映すること。
 cask "yorishiro" do
-  version "0.7.1"
+  version "0.7.2"
 
   on_arm do
-    sha256 "0ae58ccd25b16abe952a48b9baf0892bfd1ac5c72b898e3c1084f9bd184cc601"
+    sha256 "5eb3efc5d59d643f00437c47f4ac07ace3a4b282dc4a0c603ec1985213fc91db"
 
     url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/Yorishiro_#{version}_aarch64.dmg"
   end
   on_intel do
-    sha256 "9dd4ad318e1e5dbe942f9fe2647c29fc90d57d85f82117dcad326db012598cb6"
+    sha256 "f22fb579a6fb011a8400af449536ba09bf0a1f23fd8872fd5fbddff37b4bbdd7"
 
     url "https://github.com/sktkkoo/Yorishiro/releases/download/v#{version}/Yorishiro_#{version}_x64.dmg"
   end
