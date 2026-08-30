@@ -32,6 +32,7 @@ cask "yorishiro" do
   depends_on :macos
 
   app "Yorishiro.app"
+  binary "#{appdir}/Yorishiro.app/Contents/MacOS/yorishiro"
 
   zap trash: [
     "~/.yorishiro",
